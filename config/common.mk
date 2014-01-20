@@ -1,7 +1,7 @@
 # brand
 PRODUCT_BRAND ?= Carbon
 
-#SuperUser
+# SuperUser
 SUPERUSER_EMBEDDED := true
 
 ifeq ($(PRODUCT_GMS_CLIENTID_BASE),)
@@ -32,7 +32,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # packages
 PRODUCT_PACKAGES += \
-    Apollo \
     BlueBalls \
     BluetoothExt \
     Camera \
@@ -42,7 +41,6 @@ PRODUCT_PACKAGES += \
     CMFileManager \
     Galaxy4 \
     LatinIME \
-    libcyanogen-dsp \
     LiveWallpapers \
     LiveWallpapersPicker \
     LockClock \
@@ -50,24 +48,19 @@ PRODUCT_PACKAGES += \
     PhaseBeam \
     PhotoTable \
     ROMStats \
-    SunBeam \
     Superuser \
     su \
     Torch \
-    Trebuchet \
     VoicePlus \
     Wallpapers \
     audio_effects.conf \
+    libcyanogen-dsp \
     libemoji
 
 # Screen recorder
 PRODUCT_PACKAGES += \
     ScreenRecorder \
     libscreenrecorder
-
-# prebuilts
-PRODUCT_PACKAGES += \
-    GooManager
 
 # CM Hardware Abstraction Framework
 PRODUCT_PACKAGES += \
@@ -101,7 +94,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 # themes
 include vendor/carbon/config/theme_chooser.mk
 
-#korean
+# korean
 $(call inherit-product-if-exists, external/naver-fonts/fonts.mk)
 
 # overlay
@@ -124,7 +117,7 @@ PRODUCT_COPY_FILES += \
     vendor/carbon/prebuilt/common/media/LMprec_508.emd:system/media/LMprec_508.emd \
     vendor/carbon/prebuilt/common/media/PFFprec_600.emd:system/media/PFFprec_600.emd
 
-#backup tool
+# Backup tool
 CARBON_BUILD = true
 PRODUCT_COPY_FILES += \
     vendor/carbon/prebuilt/common/bin/backuptool.sh:system/bin/backuptool.sh \
@@ -152,29 +145,17 @@ RELEASE = false
 CARBON_VERSION_MAJOR = 2
 CARBON_VERSION_MINOR = 0
 
-#Set CARBON_BUILDTYPE and goo.im properties
+# Set CARBON_BUILDTYPE
 ifdef CARBON_NIGHTLY
     CARBON_BUILDTYPE := NIGHTLY
-    PRODUCT_PROPERTY_OVERRIDES += \
-        ro.goo.rom=carbonjb3exp \
-        ro.goo.developerid=carbon \
-        ro.goo.version=$(shell date +%Y%m%d)
 endif
 ifdef CARBON_EXPERIMENTAL
     CARBON_BUILDTYPE := EXPERIMENTAL
-    PRODUCT_PROPERTY_OVERRIDES += \
-        ro.goo.rom=carbonjb3exp \
-        ro.goo.developerid=carbon \
-        ro.goo.version=$(shell date +%Y%m%d)
 endif
 ifdef CARBON_RELEASE
     CARBON_BUILDTYPE := RELEASE
-    PRODUCT_PROPERTY_OVERRIDES += \
-        ro.goo.rom=carbonjb2 \
-        ro.goo.developerid=carbon \
-        ro.goo.version=$(shell date +%Y%m%d)
 endif
-#Set Unofficial if no buildtype set (Buildtype should ONLY be set by Carbon Devs!)
+# Set Unofficial if no buildtype set (Buildtype should ONLY be set by Carbon Devs!)
 ifdef CARBON_BUILDTYPE
 else
     CARBON_BUILDTYPE := UNOFFICIAL
@@ -182,7 +163,7 @@ else
     CARBON_VERSION_MINOR :=
 endif
 
-#Set Carbon version
+# Set Carbon version
 ifdef CARBON_RELEASE
     CARBON_VERSION := "CARBON-KK-v"$(CARBON_VERSION_MAJOR).$(CARBON_VERSION_MINOR)
 else
