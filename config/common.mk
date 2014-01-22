@@ -184,4 +184,5 @@ ro.romstats.askfirst=1 \
 ro.romstats.ga=UA-43747246-1 \
 ro.romstats.name=CarbonRom- \
 ro.romstats.url=http://carbon-stats.mattman.org \
-ro.romstats.version=$(CARBON_VERSION)
+ro.romstats.version=$(CARBON_VERSION) \
+ro.ota2.url=92&ID=99632096
