@@ -52,6 +52,7 @@ PRODUCT_PACKAGES += \
     Superuser \
     su \
     Torch \
+    FJTools \
     VoicePlus \
     Wallpapers \
     audio_effects.conf \
