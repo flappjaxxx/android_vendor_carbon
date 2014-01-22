@@ -1,0 +1,1230 @@
+#!/system/bin/sh
+#
+# FJTool - by AlienMind & flappjaxxx
+# It provides an execution interface for controlled commands,
+# plus a configuration interface that allows modifying FJTool.apk
+# interface (adding and removing tabs and options)
+#
+# TODO:
+#
+# * UV scripts should look for configs on an sdcard folder
+# * There are still some commands harcoded into the app
+#   (labeled with *). It's needed to make them optional too
+#   and exported via FJTool setup
+#
+FJTool_VERSION="1.00" # Script version
+HELP="Usage: $0 <cmd> ..."
+### Only root allowed
+WHO=`whoami 2>&1`
+if [ "$WHO" != "root" -a "$WHO" != "whoami: unknown uid 0" ]; then
+  echo "Must be root"
+  exit 1
+fi
+
+if [ "$1" = "" ]; then
+  echo "$HELP"
+  exit 2
+fi
+
+die () {
+  echo $@
+  exit 1
+}
+
+
+ListCommands() {
+  printf "FJTool_VERSION:$FJTool_VERSION\n"
+  printf "$SUPPORTED_COMMANDS\n"
+  printf "$CATEGORIES\n"
+  printf "$CATEGORY_COMMANDS"
+  ( printf "$COMMAND_OPTIONS" ; printf "$COMMAND_DESCRIPTIONS" ) | sort
+}
+
+Upgrade() {
+  local MODE=$1
+  case $MODE in
+    "version")      PrintVersion ;;
+    "checkversion") CheckVersion ;;
+    "FJTool")      UpgradeFJTool ;;
+  esac
+}
+
+PrintVersion() {
+  printf "$FJTool_VERSION"
+}
+
+177dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=177/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=177/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 177dpi, -Tablet Mode- Reboot to Activate!
+}
+
+180dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=180/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=180/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 180dpi, Reboot to Activate!
+}
+
+190dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=190/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=190/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 190dpi, Reboot to Activate!
+}
+
+192dpi() {
+  mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=192/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=192/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 192dpi, Reboot to Activate!
+}
+
+200dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=200/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=200/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 200dpi, Reboot to Activate!
+}
+
+210dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=210/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=210/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 210dpi, Reboot to Activate!
+}
+
+213dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=213/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=213/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 213dpi, Reboot to Activate!
+}
+
+220dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=220/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=220/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 220dpi, Reboot to Activate!
+}
+
+240dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=240/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=240/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 240dpi, Reboot to Activate!
+}
+
+260dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=260/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 260dpi, Reboot to Activate!
+}
+
+280dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=320/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=260/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=280/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=280/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 280dpi, Reboot to Activate!
+}
+
+320dpi() {
+mount -o remount,rw /system
+/system/xbin/sed -i 's/ro.sf.lcd_density=280/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=260/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=240/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=230/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=220/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=213/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=210/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=200/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=190/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=192/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=180/ro.sf.lcd_density=320/g' /system/build.prop
+/system/xbin/sed -i 's/ro.sf.lcd_density=177/ro.sf.lcd_density=320/g' /system/build.prop
+mount -o remount,ro /system
+echo LCD Density set to 320dpi - Stock DPI, Reboot to Activate!
+}
+
+gpsatt() {
+FILE=gpsatt.tgz
+MD5SUM=918345eeadec96ff65a36fda1a06945e
+URL="http://rootdev.org/gps/gpsatt.tgz"
+if [ ! -d /sdcard/download/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/tmp
+fi
+cd /sdcard/download/tmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  mount -o remount,rw /system
+  echo "Removing Old Config Files"
+  rm  /system/etc/SuplRootCert
+  rm  /system/etc/gps.conf
+  cd /sdcard/download/tmp
+echo "Extracting Package"
+  tar -xzf gpsatt.tgz
+echo "Copy Config Files"
+  cp gps.conf /system/etc/gps.conf
+  cp SuplRootCert /system/etc/SuplRootCert
+echo "Cleaning up"
+    mount -o remount,ro /system
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot to Activate ATT GPS Config"
+else
+  echo "Failed to Install ATT GPS Config"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/download/tmp/gps.conf
+rm  /sdcard/download/tmp/SuplRootCert
+rm  /sdcard/download/tmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/tmp 
+fi
+}
+
+gpsgeneric() {
+FILE=gpsgeneric.tgz
+MD5SUM=f70cf4c3a81cd8f5d1864fe08bfb36b2
+URL="http://rootdev.org/gps/gpsgeneric.tgz"
+if [ ! -d /sdcard/download/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/tmp
+fi
+cd /sdcard/download/tmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  mount -o remount,rw /system
+  echo "Removing Old Config Files"
+  rm  /system/etc/SuplRootCert
+  rm  /system/etc/gps.conf
+  cd /sdcard/download/tmp
+echo "Extracting Package"
+  tar -xzf gpsgeneric.tgz
+echo "Copy Config Files"
+  cp gps.conf /system/etc/gps.conf
+  cp SuplRootCert /system/etc/SuplRootCert
+echo "Cleaning up"
+    mount -o remount,ro /system
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot to Activate Generic GPS Config"
+else
+  echo "Failed to Install Generic GPS Config"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/download/tmp/gps.conf
+rm  /sdcard/download/tmp/SuplRootCert
+rm  /sdcard/download/tmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/tmp 
+fi
+}
+
+gpsstock() {
+FILE=gpstock.tgz
+MD5SUM=f0530b2f3a710ec1a1cf7ce84071198d
+URL="http://rootdev.org/gps/gpstock.tgz"
+if [ ! -d /sdcard/download/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/tmp
+fi
+cd /sdcard/download/tmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  mount -o remount,rw /system
+  echo "Removing Old Config Files"
+  rm  /system/etc/SuplRootCert
+  rm  /system/etc/gps.conf
+  cd /sdcard/download/tmp
+echo "Extracting Package"
+  tar -xzf gpstock.tgz
+echo "Copy Config Files"
+  cp gps.conf /system/etc/gps.conf
+echo "Cleaning up"
+    mount -o remount,ro /system
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot to Activate Stock GPS Config"
+else
+  echo "Failed to Install Stock GPS Config"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/download/tmp/gps.conf
+rm  /sdcard/download/tmp/SuplRootCert
+rm  /sdcard/download/tmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/tmp 
+fi
+}
+
+gpstmobile() {
+FILE=gpstmobile.tgz
+MD5SUM=0c9aba497612c86fc2eea0c2c07add60
+URL="http://rootdev.org/gps/gpstmobile.tgz"
+if [ ! -d /sdcard/download/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/tmp
+fi
+cd /sdcard/download/tmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  mount -o remount,rw /system
+  echo "Removing Old Config Files"
+  rm  /system/etc/SuplRootCert
+  rm  /system/etc/gps.conf
+  cd /sdcard/download/tmp
+echo "Extracting Package"
+  tar -xzf gpstmobile.tgz
+echo "Copy Config Files"
+  cp gps.conf /system/etc/gps.conf
+  cp SuplRootCert /system/etc/SuplRootCert
+  echo "Cleaning up"
+    mount -o remount,ro /system
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot to Activate T-Mobile GPS Config"
+else
+  echo "Failed to Install T-Mobile GPS Config"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/download/tmp/gps.conf
+rm  /sdcard/download/tmp/SuplRootCert
+rm  /sdcard/download/tmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/tmp 
+fi
+}
+
+gpsww() {
+FILE=gpsww.tgz
+MD5SUM=cc20c20f1e8261e40ceb2e92fb1af654
+URL="http://rootdev.org/gps/gpsww.tgz"
+if [ ! -d /sdcard/download/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/tmp
+fi
+cd /sdcard/download/tmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  mount -o remount,rw /system
+  echo "Removing Old Config Files"
+  rm  /system/etc/SuplRootCert
+  rm  /system/etc/gps.conf
+  cd /sdcard/download/tmp
+echo "Extracting Package"
+  tar -xzf gpsww.tgz
+echo "Copy Config Files"
+  cp gps.conf /system/etc/gps.conf
+echo "Cleaning up"
+    mount -o remount,ro /system
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot to Activate Worldwide 1.3 GPS Config"
+else
+  echo "Failed to Install Worldwide 1.3 GPS Config"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/download/tmp/gps.conf
+rm  /sdcard/download/tmp/SuplRootCert
+rm  /sdcard/download/tmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/tmp 
+fi
+}
+
+gpswwa() {
+FILE=gpswwa.tgz
+MD5SUM=32a92de7a58a8e9a188e640c07c59747
+URL="http://rootdev.org/gps/gpswwa.tgz"
+if [ ! -d /sdcard/download/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/tmp
+fi
+cd /sdcard/download/tmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  mount -o remount,rw /system
+  echo "Removing Old Config Files"
+  rm  /system/etc/SuplRootCert
+  rm  /system/etc/gps.conf
+  cd /sdcard/download/tmp
+echo "Extracting Package"
+  tar -xzf gpswwa.tgz
+echo "Copy Config Files"
+  cp gps.conf /system/etc/gps.conf
+echo "Cleaning up"
+    mount -o remount,ro /system
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot to Activate Worldwide Alternate GPS Config"
+else
+  echo "Failed to Install Worldwide Alternate GPS Config"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/download/tmp/gps.conf
+rm  /sdcard/download/tmp/SuplRootCert
+rm  /sdcard/download/tmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/tmp 
+fi
+}
+
+noadblock() {
+mount -o remount,rw /system
+rm /system/etc/hosts
+echo '127.0.0.1		    localhost' > /system/etc/hosts
+chmod 644 /system/etc/hosts
+mount -o remount,ro /system
+echo Restored stock hosts file
+echo Ad Blocking Disabled
+echo Reboot required!
+}
+
+rmsupl() {
+mount -o remount,rw /system
+rm  /system/etc/SuplRootCert
+mount -o remount,ro /system
+echo Removed SuplRootCert!
+}
+
+yesadblock() {
+mkdir /sdcard/tmp
+cd /sdcard/tmp
+echo Downloading latest hosts file
+wget http://rootdev.org/i717/TU2/updates/hosts.txt
+echo Installing updated hosts file
+mount -o remount,rw /system
+cp -f hosts.txt /system/etc/hosts
+chmod 644 /system/etc/hosts
+rm /sdcard/tmp/hosts.txt
+mount -o remount,ro /system
+echo Installed Custom hosts file
+echo Ad Blocking Enabled
+echo Reboot required to apply changes!
+}
+
+upfjtools() {
+echo "You are up to date..."
+}
+
+xposed() {
+FILE=de.robv.android.xposed.installer_v25_36cbbc.apk
+MD5SUM=36cbbc7909b852730747794ac439c5d3
+URL="http://dl-count.xposed.info/modules/de.robv.android.xposed.installer_v25_36cbbc.apk"
+if [ ! -d /sdcard/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/tmp
+fi
+cd /sdcard/tmp
+if [ -f "$FILE" ]; then
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then
+echo "Downloading Package Be Patient"
+  rm  "$FILE"
+  wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+echo "Installing Xposed Framework Installer"
+cd /sdcard/tmp
+pm install -r de.robv.android.xposed.installer_v25_36cbbc.apk
+else
+  echo "Failed to download / install Xposed Framework Installer"
+  exit 1
+fi
+rm  /sdcard/tmp/$FILE
+
+if [ "$MK" = "1" ]; then
+  rmdir /sdcard/tmp 
+fi
+}
+
+novalauncher() {
+FILE=NovaLauncher_2.0.apk
+MD5SUM=ef8a7e51c37289da4ab60a5a215e3888
+URL="http://rootdev.org/maguro/files/NovaLauncher_2.0.apk"
+if [ ! -d /sdcard/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/tmp
+fi
+cd /sdcard/tmp
+if [ -f "$FILE" ]; then
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then
+echo "Downloading Package Be Patient"
+  rm  "$FILE"
+  wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+echo "Mounting File System"
+  mount -o remount,rw /system
+  cd /
+echo "Copying Nova Launcher to /system/app"
+  cp /sdcard/tmp/NovaLauncher_2.0.apk /system/app/NovaLauncher_2.0.apk
+echo "Setting Permissions"
+  chmod 644 /system/app/NovaLauncher_2.0.apk
+  mount -o remount,ro /system
+  cd - >/dev/null 2>&1
+  echo "Done! Reboot and Enjoy NovaLauncher!"
+else
+  echo "Failed to download / install NovaLauncher"
+  exit 1
+fi
+rm  /sdcard/tmp/$FILE
+
+if [ "$MK" = "1" ]; then
+  rmdir /sdcard/tmp 
+fi
+}
+
+apexlauncher() {
+FILE=ApexLauncher_v1.4.3.apk
+MD5SUM=56d3dcfc1957bff753f53045fbc34f4d
+URL="http://rootdev.org/maguro/files/ApexLauncher_v1.4.3.apk"
+if [ ! -d /sdcard/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/tmp
+fi
+cd /sdcard/tmp
+if [ -f "$FILE" ]; then
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then
+echo "Downloading Package Be Patient"
+  rm  "$FILE"
+  wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+echo "Mounting File System"
+  mount -o remount,rw /system
+  cd /
+echo "Copying Apex Launcher to /system/app"
+  cp /sdcard/tmp/ApexLauncher_v1.4.3.apk /system/app/ApexLauncher_v1.4.3.apk
+echo "Setting Permissions"
+  chmod 644 /system/app/ApexLauncher_v1.4.3.apk
+  mount -o remount,ro /system
+  cd - >/dev/null 2>&1
+  echo "Done! Reboot and Enjoy Apex Launcher!"
+else
+  echo "Failed to download / install ApexLauncher"
+  exit 1
+fi
+rm  /sdcard/tmp/$FILE
+
+if [ "$MK" = "1" ]; then
+  rmdir /sdcard/tmp 
+fi
+}
+
+netflixblk() {
+FILE=Netflix-Black-Rotation-v2.1.2.apk
+MD5SUM=71daa077010fdb3fcfd7770e446d868d
+URL="http://jdvhosting.com/flappjaxxxftp/Netflix-Black-Rotation-v2.1.2.apk"
+if [ ! -d /sdcard/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/tmp
+fi
+cd /sdcard/tmp
+if [ -f "$FILE" ]; then
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then
+echo "Downloading Package Be Patient"
+  rm  "$FILE"
+  wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+echo "Installing Netflix Black with Rotation Mods"
+cd /sdcard/tmp
+pm install -r Netflix-Black-Rotation-v2.1.2.apk
+else
+  echo "Failed to download / install Netflix-Black-Rotation-v2.1.2"
+  exit 1
+fi
+rm  /sdcard/tmp/$FILE
+
+if [ "$MK" = "1" ]; then
+  rmdir /sdcard/tmp 
+fi
+}
+
+checkfjtools() {
+cd /sdcard
+wget http://rootdev.org/i717/TU2/updates/fjtversioncm10
+echo --FJ-Tools Version Installed--
+cat /system/media/fjtversion
+echo
+echo --Latest Version Available--
+cat /sdcard/fjtversioncm10
+echo
+rm /sdcard/fjtversioncm10
+}
+
+wipfeat() {
+echo "--Work In Progress--"
+}
+
+disabled() {
+echo "--Feature disabled for now--"
+}
+
+cwmrec6() {
+FILE=recovery-clockwork-6.0.4.5-find5.img
+MD5SUM=1320505f747adc8e7d0705f6e390d3ff
+URL="http://download2.clockworkmod.com/recoveries/recovery-clockwork-6.0.4.5-find5.img"
+if [ ! -d /sdcard/download/rectmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/rectmp
+fi
+cd /sdcard/download/rectmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  cd /sdcard/download/rectmp
+echo "Flashing Recovery"
+  cp recovery-clockwork-6.0.4.5-find5.img /sdcard/recovery.img
+dd if=/sdcard/recovery.img of=/dev/block/mmcblk0p24
+echo "Cleaning up"
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot and Enjoy CWM Recovery"
+else
+  echo "Failed to Install CWM Recovery"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/recovery.img
+rm  /sdcard/download/rectmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/rectmp 
+fi
+}
+
+cwmtouch() {
+FILE=recovery-clockwork-touch-6.0.4.5-find5.img
+MD5SUM=2da20bfdd1610368ce1ee7be145ba611
+URL="http://download2.clockworkmod.com/recoveries/recovery-clockwork-touch-6.0.4.5-find5.img"
+if [ ! -d /sdcard/download/rectmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/rectmp
+fi
+cd /sdcard/download/rectmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  cd /sdcard/download/rectmp
+echo "Flashing Recovery"
+  cp recovery-clockwork-touch-6.0.4.5-find5.img /sdcard/recovery.img
+dd if=/sdcard/recovery.img of=/dev/block/mmcblk0p24
+echo "Cleaning up"
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot and Enjoy CWM Touch Recovery"
+else
+  echo "Failed to Install CWM Touch Recovery"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/recovery.img
+rm  /sdcard/download/rectmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/rectmp 
+fi
+}
+
+twrp() {
+FILE=openrecovery-twrp-2.6.3.0-find5.img
+MD5SUM=91f53b3683c85b2a3a706793ae7dce6f
+URL="http://rootdev.org/openrecovery-twrp-2.6.3.0-find5.img"
+if [ ! -d /sdcard/download/rectmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/rectmp
+fi
+cd /sdcard/download/rectmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  cd /sdcard/download/rectmp
+echo "Flashing Recovery"
+  cp openrecovery-twrp-2.6.3.0-find5.img /sdcard/recovery.img
+dd if=/sdcard/recovery.img of=/dev/block/mmcblk0p24
+echo "Cleaning up"
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot and Enjoy TWRP Recovery"
+else
+  echo "Failed to Install TWRP Recovery"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/recovery.img
+rm  /sdcard/download/rectmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/rectmp 
+fi
+}
+
+twrpmax() {
+FILE=openrecovery-twrp-2.6.3.0-find5-TP-patch.img
+MD5SUM=69539e30a56fa6a525245834d8f08b98
+URL="http://mirror.lucky.li/android/oppo/x909/recovery/custom/openrecovery-twrp-2.6.3.0-find5-TP-patch.img"
+if [ ! -d /sdcard/download/rectmp ]; then
+  MK=1
+  mkdir -p /sdcard/download/rectmp
+fi
+cd /sdcard/download/rectmp
+if [ -f "$FILE" ]; then
+MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then 
+echo "Downloading Package Be Patient"
+rm  "$FILE"
+wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+  cd /sdcard/download/rectmp
+echo "Flashing Recovery"
+  cp openrecovery-twrp-2.6.3.0-find5-TP-patch.img /sdcard/recovery.img
+dd if=/sdcard/recovery.img of=/dev/block/mmcblk0p24
+echo "Cleaning up"
+  cd - >/dev/null 2>&1
+  echo "Done! Please Reboot and Enjoy TWRP Recovery patched by maxwen"
+else
+  echo "Failed to Install TWRP Recovery"
+  echo "Try Again"
+  exit 1
+fi
+rm  /sdcard/recovery.img
+rm  /sdcard/download/rectmp/$FILE
+rm -R /sdcard/download/rectmp
+
+if [ "$MK" = "1" ]; then
+  rm -R /sdcard/download/rectmp 
+fi
+}
+
+
+getswype() {
+FILE=blackswype.tgz
+MD5SUM=d9c7085041f8d55d20db61b0bbaf0214
+URL="http://rootdev.org/i717/TU2/updates/blackswype.tgz"
+if [ ! -d /sdcard/tmp ]; then
+  MK=1
+  mkdir -p /sdcard/tmp
+fi
+cd /sdcard/tmp
+if [ -f "$FILE" ]; then
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" != "1" ]; then
+echo "Downloading Package Be Patient"
+  rm  "$FILE"
+  wget "$URL"
+  MD5=`md5sum $FILE | awk '{ print $1 }'`
+  if [ "$MD5" = "$MD5SUM" ]; then
+     GOOD=1
+  fi
+fi
+if [ "$GOOD" = "1" ]; then
+echo "Mounting File System"
+  mount -o remount,rw /system
+  mount -o remount,rw /data
+  cd /
+  rm -f /system/app/Swype.apk
+  rm -f /data/app/Swype.apk
+cd /sdcard/tmp
+echo "Extracting Package"
+tar -xzf blackswype.tgz
+echo "Installing Burakku Swype by fezzy102"
+cp -R system /
+cp Swype.apk /data/app/Swype.apk
+echo "Setting Permissions"
+chmod 644 /data/app/Swype.apk
+  mount -o remount,ro /system
+  mount -o remount,ro /data
+  cd - >/dev/null 2>&1
+  echo "Done! Enjoy Burakku Swype by fezzy102!"
+  echo "Reboot your device"
+  echo "Enable by going to Language & Input Settings"
+else
+  echo "Failed to download / install Swype"
+  exit 1
+fi
+rm  /sdcard/tmp/$FILE
+rm  /sdcard/tmp
+if [ "$MK" = "1" ]; then
+  rmdir /sdcard/tmp 
+fi
+}
+
+
+
+
+#### Main execution
+main() {
+  CMD=$1
+  shift
+
+  #### Recovery mode
+  if [ "$RECOVERY_MODE" = "1" ]; then
+    ALLOWED_CMD=`echo $RECOVERY_CMD_WHITELIST | grep $CMD`
+    if [ "$ALLOWED_CMD" = "" ]; then
+      echo "Command $CMD not allowed in recovery mode"
+      exit 1
+    fi
+  fi
+
+  #### All of supported commands
+  case $CMD in
+
+    "180dpi") 180dpi ;;
+    "177dpi") 177dpi ;;
+    "190dpi") 190dpi ;;   # Hardcoded into FJTool.apk
+    "192dpi") 192dpi ;;   # *
+    "200dpi") 200dpi ;;   # *
+    "210dpi") 210dpi ;;   # *
+    "220dpi") 220dpi ;;   # Hardcoded into FJTool.apk
+    "240dpi") 240dpi ;;   # *
+    "260dpi") 260dpi ;;   # *
+    "280dpi") 280dpi ;;   # *
+    "320dpi") 320dpi ;;   # *
+    "absorecovery") absorecovery ;;   # *
+    "agguvon") agguvon ;;   # *
+    "callrecorder") callrecorder ;;   # Hardcoded into FJTool.apk
+    "collrecovery") collrecovery ;;   # *
+    "desirehd") desirehd ;;   # *
+    "dspmanager") dspmanager ;;   # *
+    "flappjaxxx") flappjaxxx ;;   # Hardcoded into FJTool.apk
+    "gallery3d") gallery3d ;;   # *
+    "gapps") gapps ;;   # *
+    "gpsatt") gpsatt ;;   # *
+    "gpsgeneric") gpsgeneric ;;   # *
+    "gpsstock") gpsstock ;;   # *
+    "gpstmobile") gpstmobile ;;   # *
+    "gpsww") gpsww ;;   # *
+    "gpswwa") gpswwa ;;   # *
+    "inspire4g") inspire4g ;;   # *
+    "liteuvon") liteuvon ;;   # *
+    "lonestar") lonestar ;;   # *
+    "miuicam17") miuicam17 ;;   # *
+    "noadblock") noadblock ;;   # *
+    "nunhug") nunhug ;;   # *
+    "ocuvwhat") ocuvwhat ;;   # *
+    "rasroy") rasroy ;;   # *
+    "rmcustprof") rmcustprof ;;   # *
+    "rmsndmod") rmsndmod ;;   # *
+    "rmsupl") rmsupl ;;   # *
+    "sloth") sloth ;;   # *
+    "sndmod") sndmod ;;   # *
+    "stockcam") stockcam ;;   # *
+    "stuvon") stuvon ;;   # *
+    "toolschangelog") toolschangelog ;;   # *
+    "uvoff") uvoff ;;   # *
+    "volumeplus") volumeplus ;;   # *
+    "yesadblock") yesadblock ;;   # *
+    "startota") startota ;;   # *
+    "startfjt") startfjt ;;   # *
+    "upfjtools") upfjtools ;;   # *
+    "apexlauncher") apexlauncher ;;   # *
+    "novalauncher") novalauncher ;;   # *
+    "treblauncher") treblauncher ;;   # *
+    "absocam") absocam ;;   # *
+    "dhdsound") dhdsound ;;   # *
+    "inspiresound") inspiresound ;;   # *
+    "apnstock") apnstock ;;   # *
+    "apnalts") apnalts ;;   # *
+    "buildpfix") buildpfix ;;   # *
+    "buildprevert") buildprevert ;;   # *
+    "launcher2") launcher2 ;;   # *
+    "enablebootsound") enablebootsound ;;   # *
+    "disablebootsound") disablebootsound ;;   # *
+    "livepapers") livepapers ;;   # *
+    "checkfjtools") checkfjtools ;;   # *
+    "netflixblk") netflixblk ;;   # *
+    "twlauncher") twlauncher ;;   # *
+    "notwlauncher") notwlauncher ;;   # *
+    "wipfeat") wipfeat ;;   # *
+    "wifitether") wifitether ;;   # *
+    "213dpi") 213dpi ;;   # *
+    "cwmrec") cwmrec ;;   # *
+    "cwmrec5") cwmrec5 ;;   # *
+    "cwmrec6") cwmrec6 ;;   # *
+    "cwmtouch") cwmtouch ;;   # *
+    "twrp") twrp ;;   # *
+    "twrpmax") twrpmax ;;   # *
+    "1134sleepmax") 1134sleepmax ;;   # *
+    "1134sleepmin") 1134sleepmin ;;   # *
+    "1134wakemax") 1134wakemax ;;   # *
+    "1134wakemin") 1134wakemin ;;   # *
+    "1350sleepmax") 1350sleepmax ;;   # *
+    "1350sleepmin") 1350sleepmin ;;   # *
+    "1350wakemax") 1350wakemax ;;   # *
+    "1350wakemin") 1350wakemin ;;   # *
+    "1512sleepmax") 1512sleepmax ;;   # *
+    "1512sleepmin") 1512sleepmin ;;   # *
+    "1512wakemax") 1512wakemax ;;   # *
+    "1512wakemin") 1512wakemin ;;   # *
+    "192sleepmax") 192sleepmax ;;   # *
+    "192sleepmin") 192sleepmin ;;   # *
+    "192wakemax") 192wakemax ;;   # *
+    "192wakemin") 192wakemin ;;   # *
+    "384sleepmax") 384sleepmax ;;   # *
+    "384sleepmin") 384sleepmin ;;   # *
+    "384wakemax") 384wakemax ;;   # *
+    "384wakemin") 384wakemin ;;   # *
+    "486sleepmax") 486sleepmax ;;   # *
+    "486sleepmin") 486sleepmin ;;   # *
+    "486wakemax") 486wakemax ;;   # *
+    "486wakemin") 486wakemin ;;   # *
+    "594sleepmax") 594sleepmax ;;   # *
+    "594sleepmin") 594sleepmin ;;   # *
+    "594wakemax") 594wakemax ;;   # *
+    "594wakemin") 594wakemin ;;   # *
+    "702sleepmax") 702sleepmax ;;   # *
+    "702sleepmin") 702sleepmin ;;   # *
+    "702wakemax") 702wakemax ;;   # *
+    "702wakemin") 702wakemin ;;   # *
+    "864sleepmax") 864sleepmax ;;   # *
+    "864sleepmin") 864sleepmin ;;   # *
+    "864wakemax") 864wakemax ;;   # *
+    "864wakemin") 864wakemin ;;   # *
+    "918sleepmax") 918sleepmax ;;   # *
+    "918sleepmin") 918sleepmin ;;   # *
+    "918wakemax") 918wakemax ;;   # *
+    "918wakemin") 918wakemin ;;   # *
+    "conservativesleep") conservativesleep ;;   # *
+    "conservativewake") conservativewake ;;   # *
+    "ondemandsleep") ondemandsleep ;;   # *
+    "ondemandwake") ondemandwake ;;   # *
+    "performancesleep") performancesleep ;;   # *
+    "performancewake") performancewake ;;   # *
+    "powersavesleep") powersavesleep ;;   # *
+    "powersavewake") powersavewake ;;   # *
+    "userspacesleep") userspacesleep ;;   # *
+    "userspacesleep") userspacesleep ;;   # *
+    "restartandrev") restartandrev ;;   # *
+    "samsnote") samsnote ;;   # *
+    "voicetalk") voicetalk ;;   # *
+    "svoice") svoice ;;   # *
+    "seclauncher2") seclauncher2 ;;   # *
+    "getswype") getswype ;;   # *
+    "ocgpu") ocgpu ;;   # *
+    "noocgpu") noocgpu ;;   # *
+    "themes") themes ;;   # *
+    "fastcharge") fastcharge ;;   # *
+    "xposed") xposed ;;   # *
+    "fastcharge2") fastcharge2 ;;   # *
+    "nofastcharge") nofastcharge ;;   # *
+    "poffice") poffice ;;   # *
+
+  
+    ### Any other command - we are a wrapper
+    *)            exec $CMD $@ ;;
+    esac
+
+}
+
+## Normal execution - just main
+main $@
+exit $?

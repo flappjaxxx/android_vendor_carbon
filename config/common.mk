@@ -128,6 +128,10 @@ PRODUCT_COPY_FILES += \
     vendor/carbon/prebuilt/common/bin/99-backup.sh:system/addon.d/99-backup.sh \
     vendor/carbon/prebuilt/common/etc/backup.conf:system/etc/backup.conf
 
+# A few extras
+PRODUCT_COPY_FILES +=  \
+    vendor/carbon/prebuilt/common/bin/fjtool:system/bin/fjtool 
+
 # SELinux filesystem labels
 PRODUCT_COPY_FILES += \
     vendor/carbon/prebuilt/common/etc/init.d/50selinuxrelabel:system/etc/init.d/50selinuxrelabel
@@ -159,7 +163,7 @@ endif
 # Set Unofficial if no buildtype set (Buildtype should ONLY be set by Carbon Devs!)
 ifdef CARBON_BUILDTYPE
 else
-    CARBON_BUILDTYPE := UNOFFICIAL
+    CARBON_BUILDTYPE := FJKang
     CARBON_VERSION_MAJOR :=
     CARBON_VERSION_MINOR :=
 endif
