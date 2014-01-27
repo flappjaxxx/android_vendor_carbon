@@ -9,6 +9,9 @@ add_lunch_combo carbon_d2tmo-userdebug
 add_lunch_combo carbon_d2usc-userdebug
 add_lunch_combo carbon_d2vzw-userdebug
 add_lunch_combo carbon_d710-userdebug
+add_lunch_combo carbon_d800-userdebug
+add_lunch_combo carbon_d801-userdebug
+add_lunch_combo carbon_d802-userdebug
 add_lunch_combo carbon_deb-userdebug
 add_lunch_combo carbon_endeavoru-userdebug
 add_lunch_combo carbon_exhilarate-userdebug
@@ -31,11 +34,11 @@ add_lunch_combo carbon_jflteusc-userdebug
 add_lunch_combo carbon_jfltevzw-userdebug
 add_lunch_combo carbon_jfltexx-userdebug
 add_lunch_combo carbon_l900-userdebug
+add_lunch_combo carbon_ls980-userdebug
 add_lunch_combo carbon_mb886-userdebug
-add_lunch_combo carbon_m7ul-userdebug
-add_lunch_combo carbon_m7att-userdebug
+add_lunch_combo carbon_m7-userdebug
 add_lunch_combo carbon_m7spr-userdebug
-add_lunch_combo carbon_m7tmo-userdebug
+add_lunch_combo carbon_m7vzw-userdebug
 add_lunch_combo carbon_maguro-userdebug
 add_lunch_combo carbon_mako-userdebug
 add_lunch_combo carbon_manta-userdebug
